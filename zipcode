@@ -1,0 +1,47 @@
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+list_o_states_matey = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida',
+'Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine',
+'Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New-Hampshire','New-Jersey',
+'New-Mexico','New-York','North-Carolina','North-Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode-Island','South-Carolina','South-Dakota',
+'Tennessee','Texas','Utah','Vermont','Virginia','Washington','West-Virginia','Wisconsin','Wyoming']
+for State in list_o_states_matey:
+    r = requests.get('https://namecensus.com/zip-codes/'+State+'/')
+
+    soup = BeautifulSoup(r.content, 'html.parser')
+    #print(soup.prettify())
+    names = soup.find_all('tr')
+
+    labels = []
+    data = []
+
+    for h in names[0].find_all('th'):
+        labels.append(h.get_text().strip())
+
+    for state in names[1:]:
+        state_list = []
+
+        for d in state.find_all('td'):
+            d_str = d.get_text().strip()
+            if d_str.isnumeric():
+                state_list.append(int(d_str))
+            else:
+                state_list.append(d_str)
+        data.append(state_list)
+        # if first_time == True:
+#        df = pd.DataFrame(data,columns=labels)
+        #     first_time = False
+        # else:
+
+df = pd.DataFrame(data, columns = labels)
+print(df)
+
+
+
+
+# with open("https://namecensus.com/zip-codes/") as zp:
+#     soup = BeautifulSoup(zp)
+# soup = BeautifulSoup("<html>data</html>")
+# print(soup)
